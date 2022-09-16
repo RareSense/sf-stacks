@@ -1,0 +1,31 @@
+
+deployment checklist
+
+
+superfam ownership
+------------------
+- deploy nft-trait on testnet only using superfandom account, 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.nft-trait on mainnet already deployed by stacks
+
+- deploy commission-trait using superfandom account both on testnet and mainnet
+
+- update the reference of comission-trait in sf-commission contract
+- deploy sf-commission contract from superfandom account both on testnet and mainnet
+
+- add nft-trait reference for testnet in sf-marketplace-bid
+- deploy sf-marketplace-bid on both testnet and mainnet
+
+
+creator ownership
+-----------------
+sf-continuous 
+  update nft-trait reference for testnet
+  update commission-trait for both testnet and mainnet
+  follow the checklist at the top of sf-continuous
+  deploy it using creator account
+
+sf-editions
+  update nft-trait reference for testnet
+  update commission-trait for both testnet and mainnet
+  follow the checklist at the top of sf-editions
+  deploy it using creator account
+

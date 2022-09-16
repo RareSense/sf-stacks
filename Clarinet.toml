@@ -1,0 +1,39 @@
+[project]
+name = "sf-stacks"
+authors = []
+description = ""
+telemetry = false
+boot_contracts = ["pox", "costs-v2", "bns"]
+
+[[project.requirements]]
+contract_id = "SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait"
+
+[project.cache_location]
+path = ".requirements"
+[contracts.commission-trait]
+path = "contracts/commission-trait.clar"
+
+[contracts.sf-commission]
+path = "contracts/sf-commission.clar"
+
+[contracts.sf-continuous]
+path = "contracts/sf-continuous.clar"
+
+[contracts.sf-editions]
+path = "contracts/sf-editions.clar"
+
+[contracts.sf-marketplace-bid]
+path = "contracts/sf-marketplace-bid.clar"
+
+[repl]
+costs_version = 2
+parser_version = 2
+
+[repl.analysis]
+passes = ["check_checker"]
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
