@@ -1,4 +1,4 @@
-;; sf-editions
+;; sf-editions-sb
 ;; checklist when deploying for a new collection change the following
 ;;  1. set comission contract that implemented comission-trait
 ;;  2. replace nft-asset-class with meaningful name e.g. megapont-ap

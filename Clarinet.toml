@@ -19,8 +19,15 @@ path = "contracts/sf-commission.clar"
 [contracts.sf-continuous]
 path = "contracts/sf-continuous.clar"
 
+[contracts.sf-continuous-sb]
+path = "contracts/sf-continuous-sb.clar"
+
 [contracts.sf-editions]
 path = "contracts/sf-editions.clar"
+
+[contracts.sf-editions-sb]
+path = "contracts/sf-editions-sb.clar"
+
 
 [contracts.sf-marketplace-bid]
 path = "contracts/sf-marketplace-bid.clar"
