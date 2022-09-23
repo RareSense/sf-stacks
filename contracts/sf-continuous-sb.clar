@@ -145,20 +145,17 @@
 )
 
 ;; #[allow(unchecked_data)]
-(define-public (create-mint-passes (uris (list 25 (string-ascii 256))))
-  (create-many-mint-passes uris))
-
-(define-private (create-many-mint-passes (uris (list 25 (string-ascii 256))))
+(define-private (create-mint-passes (uris (list 25 (string-ascii 256))))
   (let 
     (
       (art-addr (var-get artist-address))
-      (pass-ids (map many-mint-passes-iter uris))
+      (pass-ids (map create-mint-pass uris))
     )
     (asserts! (or (is-eq tx-sender DEPLOYER) (is-eq tx-sender art-addr)) (err ERR-NOT-AUTHORIZED))
     (asserts! (is-eq (var-get locked) false) (err ERR-CONTRACT-LOCKED))
     (ok pass-ids)))
 
-(define-private (many-mint-passes-iter (uri (string-ascii 256)))
+(define-private (create-mint-pass (uri (string-ascii 256)))
   (let 
     (
       (pass-id (+ (var-get last-id) u1))
