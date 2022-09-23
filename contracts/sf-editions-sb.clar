@@ -49,6 +49,7 @@
 (define-data-var locked bool false)
 
 (define-map mints-per-user principal uint)
+(define-map mint-passes uint (optional principal))
 
 (define-public (lock-contract)
   (begin

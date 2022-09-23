@@ -66,8 +66,13 @@
   (begin
     (asserts! (or (is-eq tx-sender (var-get artist-address)) (is-eq tx-sender DEPLOYER)) (err ERR-NOT-AUTHORIZED))
     (asserts! (not (var-get metadata-frozen)) (err ERR-METADATA-FROZEN))
-    (map-set cids token-id uri)
-    (ok true)))
+    (match (map-get? mint-passes token-id)
+      old-uri (map-set mint-passes token-id uri)
+      (map-set cids token-id uri)
+    )
+    (ok true)
+  )
+)
 
 (define-public (freeze-metadata)
   (begin
