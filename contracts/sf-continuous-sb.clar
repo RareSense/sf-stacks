@@ -26,7 +26,6 @@
 (define-constant ERR-INVALID-PERCENTAGE u114)
 
 (define-data-var last-id uint u0)
-(define-data-var last-mint-pass-id uint u0)
 (define-data-var artist-address principal tx-sender)
 (define-data-var locked bool false)
 (define-data-var metadata-frozen bool false)
@@ -47,10 +46,21 @@
     (ok (var-set artist-address address))))
 
 (define-public (burn (token-id uint))
-  (begin 
-    (asserts! (is-owner token-id tx-sender) (err ERR-NOT-AUTHORIZED))
-    (nft-burn? nft-asset-class token-id tx-sender)))
+   (match (map-get? mint-passes token-id)
+      uri (begin 
+          (asserts! (is-eq tx-sender DEPLOYER) (err ERR-NOT-AUTHORIZED))
+          (map-delete mint-passes token-id)
+          (ok true)
+      )
+      (begin 
+        (asserts! (is-owner token-id tx-sender) (err ERR-NOT-AUTHORIZED))
+        (nft-burn? nft-asset-class token-id tx-sender))
+    )
+)
 
+(define-private (is-owner (token-id uint) (user principal))
+  (is-eq user (unwrap! (nft-get-owner? nft-asset-class token-id) false)))
+ 
 ;; #[allow(unchecked_data)]
 (define-public (set-token-uri (uri (string-ascii 256)) (token-id uint))
   (begin
@@ -65,17 +75,14 @@
     (var-set metadata-frozen true)
     (ok true)))
 
-(define-private (is-owner (token-id uint) (user principal))
-    (is-eq user (unwrap! (nft-get-owner? nft-asset-class token-id) false)))
-
 ;; #[allow(unchecked_data)]
 (define-public (transfer (mint-pass uint) (sender principal) (recipient principal))
   (begin
     (asserts! (is-eq tx-sender sender) (err ERR-INVALID-USER))
     (asserts! (or (is-eq tx-sender (var-get artist-address)) (is-eq tx-sender DEPLOYER)) (err ERR-NOT-AUTHORIZED))
     (match (trnsfr mint-pass sender recipient)
-      token-id (ok (some true))
-      err
+      token-id (ok true)
+      err (err err)
     )
   )
 )
@@ -110,25 +117,25 @@
 (define-private (mint-many (passes (list 25 uint)))
   (let 
     (
-      (token-id (+ (var-get last-id) u1))
       (art-addr (var-get artist-address))
-      (id-reached (fold mint-many-iter passes token-id))
+      (result (fold mint-many-iter passes (ok true)))
       (current-balance (get-balance tx-sender))
     )
     (asserts! (is-eq (var-get locked) false) (err ERR-CONTRACT-LOCKED))
-    (var-set last-id (- id-reached u1))
-    (map-set token-count tx-sender (+ current-balance (- id-reached token-id)))    
-    (ok id-reached)))
+    (map-set token-count tx-sender (+ current-balance (len passes)))    
+    result
+  )
+)
 
-(define-private (mint-many-iter (mint-pass uint) (next-id uint))
+(define-private (mint-many-iter (mint-pass uint) (last-success (response bool uint)))
   (let 
     (
-      (uri (unwrap! (map-get? mint-passes mint-pass) next-id))
+      (uri (unwrap! (map-get? mint-passes mint-pass) (err ERR-NOT-FOUND)))
     ) 
-    (unwrap! (nft-mint? nft-asset-class next-id tx-sender) next-id)
+    (try! last-success)
     (map-delete mint-passes mint-pass)
-    (map-set cids next-id uri)      
-    (+ next-id u1)
+    (map-set cids mint-pass uri)      
+    (nft-mint? nft-asset-class mint-pass tx-sender)
   )
 )
 
@@ -149,10 +156,10 @@
 (define-private (many-mint-passes-iter (uri (string-ascii 256)))
   (let 
     (
-      (pass-id (+ (var-get last-mint-pass-id) u1))
+      (pass-id (+ (var-get last-id) u1))
     )
     (map-set mint-passes pass-id uri)
-    (var-set last-mint-pass-id pass-id)
+    (var-set last-id pass-id)
     pass-id
   )
 )
@@ -169,16 +176,15 @@
   (let 
     (
       (uri (unwrap! (map-get? mint-passes mint-pass) (err ERR-NOT-FOUND)))
-      (token-id (+ (var-get last-id) u1)) 
       (recipient-balance (get-balance recipient))
     ) 
-    (try! (nft-mint? nft-asset-class token-id tx-sender))
+    (try! (nft-mint? nft-asset-class mint-pass tx-sender))
     (map-delete mint-passes mint-pass)
-    (map-set cids token-id uri)      
+    (map-set cids mint-pass uri)      
     (map-set token-count
             recipient
             (+ recipient-balance u1))
-    (ok token-id)
+    (ok mint-pass)
   )
 )
 
