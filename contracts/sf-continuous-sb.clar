@@ -116,36 +116,36 @@
 )
 
 ;; #[allow(unchecked_data)]
-(define-public (claim (passes (list 25 uint)))
-  (mint-many passes))
+;; (define-public (claim (passes (list 25 uint)))
+;;   (mint-many passes))
 
-(define-private (mint-many (passes (list 25 uint)))
-  (let 
-    (
-      (art-addr (var-get artist-address))
-      (result (fold mint-many-iter passes (ok true)))
-      (current-balance (get-balance tx-sender))
-    )
-    (asserts! (is-eq (var-get locked) false) (err ERR-CONTRACT-LOCKED))
-    (map-set token-count tx-sender (+ current-balance (len passes)))    
-    result
-  )
-)
+;; (define-private (mint-many (passes (list 25 uint)))
+;;   (let 
+;;     (
+;;       (art-addr (var-get artist-address))
+;;       (result (fold mint-many-iter passes (ok true)))
+;;       (current-balance (get-balance tx-sender))
+;;     )
+;;     (asserts! (is-eq (var-get locked) false) (err ERR-CONTRACT-LOCKED))
+;;     (map-set token-count tx-sender (+ current-balance (len passes)))    
+;;     result
+;;   )
+;; )
 
-(define-private (mint-many-iter (mint-pass uint) (last-success (response bool uint)))
-  (let 
-    (
-      (uri (unwrap! (map-get? mint-passes mint-pass) (err ERR-NOT-FOUND)))
-    ) 
-    (try! last-success)
-    (map-delete mint-passes mint-pass)
-    (map-set cids mint-pass uri)      
-    (nft-mint? nft-asset-class mint-pass tx-sender)
-  )
-)
+;; (define-private (mint-many-iter (mint-pass uint) (last-success (response bool uint)))
+;;   (let 
+;;     (
+;;       (uri (unwrap! (map-get? mint-passes mint-pass) (err ERR-NOT-FOUND)))
+;;     ) 
+;;     (try! last-success)
+;;     (map-delete mint-passes mint-pass)
+;;     (map-set cids mint-pass uri)      
+;;     (nft-mint? nft-asset-class mint-pass tx-sender)
+;;   )
+;; )
 
 ;; #[allow(unchecked_data)]
-(define-private (create-mint-passes (uris (list 25 (string-ascii 256))))
+(define-public (create-mint-passes (uris (list 25 (string-ascii 256))))
   (let 
     (
       (art-addr (var-get artist-address))

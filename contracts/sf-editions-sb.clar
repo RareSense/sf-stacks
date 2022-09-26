@@ -49,35 +49,12 @@
 (define-data-var locked bool false)
 
 (define-map mints-per-user principal uint)
-(define-map mint-passes uint bool)
 
 (define-public (lock-contract)
   (begin
     (asserts! (or (is-eq tx-sender (var-get artist-address)) (is-eq tx-sender DEPLOYER)) (err ERR-NOT-AUTHORIZED))
     (var-set locked true)
     (ok true)))
-
-;; #[allow(unchecked_data)]
-(define-public (create-mint-passes (passes (list 25 bool)))
-  (let 
-    (
-      (art-addr (var-get artist-address))
-      (pass-ids (map create-mint-pass passes))
-    )
-    (asserts! (or (is-eq tx-sender DEPLOYER) (is-eq tx-sender art-addr)) (err ERR-NOT-AUTHORIZED))
-    (asserts! (is-eq (var-get locked) false) (err ERR-CONTRACT-LOCKED))
-    (ok pass-ids)))
-
-(define-private (create-mint-pass (i bool))
-  (let 
-    (
-      (pass-id (+ (var-get last-id) u1))
-    )
-    (map-set mint-passes pass-id true)
-    (var-set last-id pass-id)
-    pass-id
-  )
-)
 
 (define-public (claim) 
   (mint (list true)))
@@ -174,16 +151,9 @@
 
 
 (define-public (burn (token-id uint))
-   (match (map-get? mint-passes token-id)
-      exists (begin 
-          (asserts! (is-eq tx-sender DEPLOYER) (err ERR-NOT-AUTHORIZED))
-          (map-delete mint-passes token-id)
-          (ok true)
-      )
-      (begin 
+     (begin 
         (asserts! (is-owner token-id tx-sender) (err ERR-NOT-AUTHORIZED))
         (nft-burn? nft-asset-class token-id tx-sender))
-    )
 )
 
 
@@ -207,26 +177,19 @@
 ;; ;; Non-custodial SIP-009 transfer function
 
 ;; ;; #[allow(unchecked_data)]
-(define-public (transfer (mint-pass uint) (sender principal) (recipient principal))
+(define-public (transfer (token-id uint) (sender principal) (recipient principal))
   (begin
     (asserts! (is-eq tx-sender sender) (err ERR-INVALID-USER))
     (asserts! (or (is-eq tx-sender (var-get artist-address)) (is-eq tx-sender DEPLOYER)) (err ERR-NOT-AUTHORIZED))
-    (match (trnsfr mint-pass sender recipient)
-      token-id (ok true)
+    (match (trnsfr token-id sender recipient)
+      id (ok true)
       err (err err)
     )
   )
 )
 ;; read-only functions
 (define-read-only (get-owner (token-id uint))
-  (match (nft-get-owner? nft-asset-class token-id)
-    owner (ok (some owner))
-    (match (map-get? mint-passes token-id)
-      exists (ok (some DEPLOYER))
-      (err ERR-NOT-FOUND)
-    )
-  )
-)
+  (ok (nft-get-owner? nft-asset-class token-id)))
 
 (define-read-only (get-last-token-id)
   (ok (- (var-get last-id) u1)))
@@ -250,83 +213,22 @@
 
 
 (define-map token-count principal uint)
-(define-map market uint {price: uint, commission: principal, royalty: uint})
+;; (define-map market uint {price: uint, commission: principal, royalty: uint})
 
 (define-read-only (get-balance (account principal))
   (default-to u0
     (map-get? token-count account)))
 
 ;; #[allow(unchecked_data)]
-(define-private (trnsfr (mint-pass uint) (sender principal) (recipient principal))
+(define-private (trnsfr (token-id uint) (sender principal) (recipient principal))
   (let 
     (
       (recipient-balance (get-balance recipient))
     ) 
-    (unwrap! (map-get? mint-passes mint-pass) (err ERR-NOT-FOUND))
-    (try! (nft-mint? nft-asset-class mint-pass tx-sender))
-    (map-delete mint-passes mint-pass)
+    (try! (nft-mint? nft-asset-class token-id tx-sender))
     (map-set token-count
             recipient
             (+ recipient-balance u1))
-    (ok mint-pass)
+    (ok token-id)
   )
 )
-
-(define-private (is-sender-owner (mint-pass uint))
-  (begin
-    (unwrap! (map-get? mint-passes mint-pass) false)
-    (or (is-eq tx-sender DEPLOYER) (is-eq tx-sender (var-get artist-address)))
-  )
-)
-
-(define-read-only (get-listing-in-ustx (id uint))
-  (map-get? market id))
-
-(define-public (list-in-ustx (id uint) (price uint) (comm-trait <commission-trait>))
-  (let ((listing  {price: price, commission: (contract-of comm-trait), royalty: (var-get royalty-percent)}))
-    (asserts! (is-sender-owner id) (err ERR-NOT-AUTHORIZED))
-    (map-set market id listing)
-    (print (merge listing {a: "list-in-ustx", id: id}))
-    (ok true)))
-
-(define-public (unlist-in-ustx (id uint))
-  (begin
-    (asserts! (is-sender-owner id) (err ERR-NOT-AUTHORIZED))
-    (map-delete market id)
-    (print {a: "unlist-in-ustx", id: id})
-    (ok true)))
-
-(define-public (buy-in-ustx (id uint) (comm-trait <commission-trait>))
-  (let ((owner (unwrap! (nft-get-owner? nft-asset-class id) (err ERR-NOT-FOUND)))
-      (listing (unwrap! (map-get? market id) (err ERR-LISTING)))
-      (price (get price listing))
-      (royalty (get royalty listing)))
-    (asserts! (is-eq (contract-of comm-trait) (get commission listing)) (err ERR-WRONG-COMMISSION))
-    (try! (stx-transfer? price tx-sender owner))
-    (try! (pay-royalty price royalty))
-    (try! (contract-call? comm-trait pay id price))
-    (try! (trnsfr id owner tx-sender))
-    (map-delete market id)
-    (print {a: "buy-in-ustx", id: id})
-    (ok true)))
-    
-(define-data-var royalty-percent uint u500)
-
-(define-read-only (get-royalty-percent)
-  (ok (var-get royalty-percent)))
-
-(define-public (set-royalty-percent (royalty uint))
-  (begin
-    (asserts! (or (is-eq tx-sender (var-get artist-address)) (is-eq tx-sender DEPLOYER)) (err ERR-INVALID-USER))
-    (asserts! (and (>= royalty u0) (<= royalty u1000)) (err ERR-INVALID-PERCENTAGE))
-    (ok (var-set royalty-percent royalty))))
-
-(define-private (pay-royalty (price uint) (royalty uint))
-  (let (
-    (royalty-amount (/ (* price royalty) u10000))
-  )
-  (if (> royalty-amount u0)
-    (try! (stx-transfer? royalty-amount tx-sender (var-get artist-address)))
-    (print false)
-  )
-  (ok true)))

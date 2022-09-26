@@ -50,18 +50,7 @@ Clarinet.test({
         let wallet_1 = accounts.get('wallet_1')!;
         let block = chain.mineBlock([
             Tx.contractCall('sf-editions', 'claim', [], wallet_1.address),
-            // Tx.contractCall('superfandom-nft-v2', 'get-token-uri', [types.uint(1)], deployer.address),
-            // Tx.contractCall('superfandom-nft-v2', 'get-redemption-count', [types.uint(1)], deployer.address),
-            // Tx.contractCall('superfandom-nft-v2', 'get-beneficiaries', [types.uint(1)], deployer.address),
-            // Tx.contractCall('superfandom-nft-v2', 'get-owner', [types.uint(1)], deployer.address),
         ]);
-        // assertEquals(block.receipts.length, 5);
         assertEquals(block.height, 2);
-        // block.receipts[0].result.expectOk().expectUint(1);
-        // block.receipts[1].result.expectOk().expectSome().expectAscii(metadataURL);
-        // block.receipts[2].result.expectSome().expectUint(redemptionCount);
-        // block.receipts[3].result.expectSome().expectList().map((e: any) => { e.expectAscii("1234") });
-        // block.receipts[4].result.expectOk().expectSome().expectPrincipal(deployer.address + '.superfandom-nft-v2');
-        console.log("block", block);
     },
 });
