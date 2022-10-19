@@ -45,7 +45,7 @@
 (define-data-var premint-enabled bool false)
 (define-data-var sale-enabled bool false)
 (define-data-var metadata-frozen bool false)
-(define-data-var mint-cap uint u0)
+(define-data-var mint-cap uint u10)
 (define-data-var locked bool false)
 
 (define-map mints-per-user principal uint)
@@ -208,6 +208,9 @@
 
 (define-read-only (get-mint-limit)
   (ok (var-get mint-limit)))
+
+(define-read-only (get-mint-cap)
+  (ok (var-get mint-cap)))
 
 ;; Non-custodial marketplace extras
 
