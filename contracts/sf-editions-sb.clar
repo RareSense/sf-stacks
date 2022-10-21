@@ -59,6 +59,10 @@
 (define-public (claim) 
   (mint (list true)))
 
+;; Claim Many
+(define-public (claim-many (orders (list 25 bool)))
+  (mint-many orders))
+
 ;; Default Minting
 (define-private (mint (orders (list 25 bool)))
   (mint-many orders))
