@@ -180,7 +180,7 @@
       (uri (unwrap! (map-get? mint-passes mint-pass) (err ERR-NOT-FOUND)))
       (recipient-balance (get-balance recipient))
     ) 
-    (try! (nft-mint? nft-asset-class mint-pass tx-sender))
+    (try! (nft-mint? nft-asset-class mint-pass recipient))
     (map-delete mint-passes mint-pass)
     (map-set cids mint-pass uri)      
     (map-set token-count
