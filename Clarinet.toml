@@ -32,6 +32,10 @@ path = "contracts/sf-editions-sb.clar"
 [contracts.sf-marketplace-bid]
 path = "contracts/sf-marketplace-bid.clar"
 
+
+[contracts.sf-marketplace-v2]
+path = "contracts/sf-marketplace-v2.clar"
+
 [repl]
 costs_version = 2
 parser_version = 2
