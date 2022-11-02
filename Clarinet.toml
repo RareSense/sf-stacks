@@ -19,8 +19,8 @@ path = "contracts/sf-commission.clar"
 [contracts.sf-continuous]
 path = "contracts/sf-continuous.clar"
 
-[contracts.sf-continuous-sb]
-path = "contracts/sf-continuous-sb.clar"
+[contracts.sf-continuous-sb-v2]
+path = "contracts/sf-continuous-sb-v2.clar"
 
 [contracts.sf-editions]
 path = "contracts/sf-editions.clar"
@@ -33,8 +33,8 @@ path = "contracts/sf-editions-sb.clar"
 path = "contracts/sf-marketplace-bid.clar"
 
 
-[contracts.sf-marketplace-v2]
-path = "contracts/sf-marketplace-v2.clar"
+[contracts.sf-auctions]
+path = "contracts/sf-auctions.clar"
 
 [repl]
 costs_version = 2

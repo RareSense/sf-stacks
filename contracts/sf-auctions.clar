@@ -16,7 +16,7 @@
     bid-amount: uint, 
     buyer: principal, 
     seller: (optional principal), 
-    expiration-block: uint, 
+    ;; expiration-block: uint, 
     action-event-index: uint,
     memo: (optional (string-ascii 256))
   }
@@ -39,20 +39,22 @@
 
 (define-data-var placing-bids-enabled bool true)
 (define-data-var accepting-bids-enabled bool true)
-(define-data-var withdrawing-bids-enabled bool true)
+;; (define-data-var withdrawing-bids-enabled bool true)
 (define-data-var commission uint u200)
 (define-data-var id uint u0)
 
 ;; #[allow(unchecked_data)]
-(define-public (place-bid (collection <nft-trait>) (nft-id uint) (amount uint) (expiration uint) (memo (optional (string-ascii 256))))
+(define-public (place-bid (collection <nft-trait>) (nft-id uint) (amount uint) (memo (optional (string-ascii 256))))
   (let ((block block-height)
         ;; (next-bid-id (var-get id))
         (nft-owner (get-owner collection nft-id))  
-        (nft { bid-amount: amount, buyer: tx-sender, seller: nft-owner, action-event-index: u0, memo: memo, expiration-block: (+ expiration block)})
+        (nft { bid-amount: amount, buyer: tx-sender, seller: nft-owner, action-event-index: u0, memo: memo,
+        ;;  expiration-block: (+ expiration block)
+         })
         )
     
     (asserts! (var-get placing-bids-enabled) (err err-placing-bids-disabled))
-    (asserts! (>= expiration (* blocks-per-day u2)) (err err-not-enough-bid-expiry))
+    ;; (asserts! (>= expiration (* blocks-per-day u2)) (err err-not-enough-bid-expiry))
     
     ;; (asserts! (contract-call? .nft-oracle-v2 is-trusted (contract-of collection))
     ;;           (err err-contract-not-authorized))
@@ -64,10 +66,7 @@
                 
                 ;; Review for social engineering attack
                 (map-delete bids {collection: (contract-of collection), nft-id: nft-id})
-                (try! (as-contract (stx-transfer? (get bid-amount bid) contract-address (unwrap-panic (get seller bid)))))
-                (print {
-                    message: "Deleted previous bid"
-                })
+                (try! (as-contract (stx-transfer? (get bid-amount bid) contract-address (get buyer bid))))
                 (unwrap-panic (private-place-bid collection nft-id nft))
                 ;; (ok true)
             )
@@ -103,9 +102,13 @@
   )
 )
 
+;; Removed (expiration-block uint) from nft tuple
 (define-private (private-place-bid (collection <nft-trait>) (nft-id uint)
+
     (nft (tuple
-         (bid-amount uint) (buyer principal) (expiration-block uint) (seller (optional principal)) 
+         (bid-amount uint) (buyer principal)
+          
+           (seller (optional principal)) 
          (action-event-index uint) (memo (optional (string-ascii 256)))
     ))
 )
@@ -123,7 +126,7 @@
                 bidder_address: tx-sender,
                 seller_address: (get seller nft),
                 bid_amount: (get bid-amount nft), 
-                expiration_block: (get expiration-block nft),
+                ;; expiration_block: (get expiration-block nft),
                 memo: (get memo nft)
             }
         })
@@ -163,14 +166,14 @@
 ;; )
 
 ;; #[allow(unchecked_data)]
-(define-public (accept-bid (bid-id uint) (collection <nft-trait>) (nft-id uint))
+(define-public (accept-bid (collection <nft-trait>) (nft-id uint))
   (let ((bid (get-bid collection nft-id))
         (bid-nft-id nft-id)
         (bid-collection (contract-of collection))
         (bidder (get buyer bid))
         (bid-amount (get bid-amount bid))
         (bid-action-event-index (get action-event-index bid))
-        (expiration-block (get expiration-block bid))
+        ;; (expiration-block (get expiration-block bid))
         (nft-owner (unwrap! (get-owner collection nft-id) (err err-user-not-authorized)))
         (royalty (get-royalty (contract-of collection)))
         (royalty-address (get address royalty))
@@ -189,7 +192,7 @@
     ;;             (and (is-some bid-nft-id) (is-eq (unwrap-panic bid-nft-id) nft-id))) 
     ;;           (err err-wrong-nft-id))
     (asserts! (is-eq tx-sender nft-owner) (err err-user-not-authorized))
-    (asserts! (> expiration-block block) (err err-bid-expired))
+    ;; (asserts! (> expiration-block block) (err err-bid-expired))
 
     (map-delete bids {collection: (contract-of collection), nft-id: nft-id})
     (try! (contract-call? collection transfer nft-id tx-sender bidder))
@@ -210,7 +213,7 @@
         bidder_address: bidder,
         seller_address: nft-owner,
         bid_amount: bid-amount, 
-        expiration_block: expiration-block,
+        ;; expiration_block: expiration-block,
         royalty: {
           recipient_address: royalty-address,
           percent: (get percent royalty),
@@ -298,7 +301,9 @@
 
 (define-read-only (get-bid (collection <nft-trait>) (nft-id uint))
   (default-to
-    {buyer: contract-owner, seller: none, bid-amount: u0, expiration-block: block-height, action-event-index: u0}
+    {buyer: contract-owner, seller: none, bid-amount: u0,
+    ;;  expiration-block: block-height,
+      action-event-index: u0}
     (map-get? bids {collection: (contract-of collection), nft-id: nft-id})
   )
 )
