@@ -41,7 +41,7 @@
 (define-data-var total-price uint u1000000)
 (define-data-var artist-address principal tx-sender)
 (define-data-var metadata-uri (string-ascii 256) "https://superfandom.io/editions.json")
-(define-data-var mint-paused bool false)
+(define-data-var mint-paused bool true)
 (define-data-var premint-enabled bool false)
 (define-data-var sale-enabled bool false)
 (define-data-var metadata-frozen bool false)
@@ -60,6 +60,7 @@
   (mint (list true)))
 
 ;; Claim Many
+;; #[allow(unchecked_data)]
 (define-public (claim-many (orders (list 25 bool)))
   (mint-many orders))
 
