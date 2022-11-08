@@ -4,3 +4,4 @@
 .requirements/
 history.txt
 .debug_history
+.cache
