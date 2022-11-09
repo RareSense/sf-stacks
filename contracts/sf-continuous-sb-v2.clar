@@ -134,6 +134,10 @@
     )
     (asserts! (or (is-eq tx-sender DEPLOYER) (is-eq tx-sender art-addr)) (err ERR-NOT-AUTHORIZED))
     (asserts! (is-eq (var-get locked) false) (err ERR-CONTRACT-LOCKED))
+    (print {
+      mintPasses: pass-ids,
+      uris: uris
+    })
     (ok pass-ids)))
 
 (define-private (create-mint-pass (uri (string-ascii 256)))
