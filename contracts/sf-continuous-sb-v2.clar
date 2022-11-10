@@ -59,11 +59,13 @@
               item (err ERR-MINTPASS-LISTED)
               (begin 
                 (map-delete mint-passes token-id)
+                (print {method: "burn", tokenId: token-id})
                 (ok true)
               ))
       )
       (begin 
         (asserts! (is-owner token-id tx-sender) (err ERR-NOT-AUTHORIZED))
+        (print {method: "burn", tokenId: token-id})
         (nft-burn? nft-asset-class token-id tx-sender))
     )
 )
