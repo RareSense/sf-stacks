@@ -28,6 +28,9 @@ path = "contracts/sf-editions.clar"
 [contracts.sf-editions-sb]
 path = "contracts/sf-editions-sb.clar"
 
+[contracts.sf-editions-sb-v2]
+path = "contracts/sf-editions-sb-v2.clar"
+
 
 [contracts.sf-marketplace-bid]
 path = "contracts/sf-marketplace-bid.clar"

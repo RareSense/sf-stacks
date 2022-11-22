@@ -1,0 +1,73 @@
+---
+id: 0
+name: Devnet deployment
+network: devnet
+stacks-node: "http://localhost:20443"
+bitcoin-node: "http://devnet:devnet@localhost:18443"
+plan:
+  batches:
+    - id: 0
+      transactions:
+        - requirement-publish:
+            contract-id: SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait
+            remap-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            remap-principals:
+              SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 4680
+            path: ".cache\\requirements\\SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.clar"
+        - contract-publish:
+            contract-name: commission-trait
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 830
+            path: "contracts\\commission-trait.clar"
+            anchor-block-only: true
+            clarity-version: 1
+        - contract-publish:
+            contract-name: sf-continuous-sb-v2
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 77360
+            path: "contracts\\sf-continuous-sb-v2.clar"
+            anchor-block-only: true
+            clarity-version: 1
+        - contract-publish:
+            contract-name: sf-marketplace-bid
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 94270
+            path: "contracts\\sf-marketplace-bid.clar"
+            anchor-block-only: true
+            clarity-version: 1
+        - contract-publish:
+            contract-name: sf-continuous
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 67910
+            path: "contracts\\sf-continuous.clar"
+            anchor-block-only: true
+            clarity-version: 1
+        - contract-publish:
+            contract-name: sf-editions-sb
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 88350
+            path: "contracts\\sf-editions-sb.clar"
+            anchor-block-only: true
+            clarity-version: 1
+        - contract-publish:
+            contract-name: sf-auctions
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 68860
+            path: "contracts\\sf-auctions.clar"
+            anchor-block-only: true
+            clarity-version: 1
+        - contract-publish:
+            contract-name: sf-commission
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 9270
+            path: "contracts\\sf-commission.clar"
+            anchor-block-only: true
+            clarity-version: 1
+        - contract-publish:
+            contract-name: sf-editions
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 106820
+            path: "contracts\\sf-editions.clar"
+            anchor-block-only: true
+            clarity-version: 1
