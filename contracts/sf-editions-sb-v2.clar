@@ -100,7 +100,9 @@
       (map-set token-count recipient (+ (get-balance recipient) u1))   
       (print {
         nftId: next-id,
-        owner: recipient
+        owner: recipient,
+        metadataUri: (var-get metadata-uri),
+        price: (var-get total-price)
       })   
       (+ next-id u1)
     )
@@ -140,7 +142,9 @@
     (print {
       lastNftId: last-nft-id,
       idReached: id-reached,
-      owner: tx-sender
+      owner: tx-sender,
+      metadataUri: (var-get metadata-uri),
+      price: (var-get total-price)
     })
     (ok id-reached)))
 
