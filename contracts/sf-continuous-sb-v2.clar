@@ -24,6 +24,7 @@
 (define-constant ERR-CONTRACT-LOCKED u107)
 (define-constant ERR-METADATA-FROZEN u111)
 (define-constant ERR-INVALID-PERCENTAGE u114)
+(define-constant ERR-MINTPASS-LISTED u115)
 
 (define-data-var last-id uint u0)
 (define-data-var artist-address principal tx-sender)
@@ -32,6 +33,11 @@
 
 (define-map cids uint (string-ascii 256))
 (define-map mint-passes uint (string-ascii 256))
+
+
+(define-map token-count principal uint)
+(define-map market uint {price: uint, commission: principal, royalty: uint})
+
 
 (define-public (lock-contract)
   (begin
@@ -49,11 +55,17 @@
    (match (map-get? mint-passes token-id)
       uri (begin 
           (asserts! (is-eq tx-sender DEPLOYER) (err ERR-NOT-AUTHORIZED))
-          (map-delete mint-passes token-id)
-          (ok true)
+          (match (map-get? market token-id)
+              item (err ERR-MINTPASS-LISTED)
+              (begin 
+                (map-delete mint-passes token-id)
+                (print {method: "burn", tokenId: token-id})
+                (ok true)
+              ))
       )
       (begin 
         (asserts! (is-owner token-id tx-sender) (err ERR-NOT-AUTHORIZED))
+        (print {method: "burn", tokenId: token-id})
         (nft-burn? nft-asset-class token-id tx-sender))
     )
 )
@@ -116,35 +128,6 @@
 )
 
 ;; #[allow(unchecked_data)]
-;; (define-public (claim (passes (list 25 uint)))
-;;   (mint-many passes))
-
-;; (define-private (mint-many (passes (list 25 uint)))
-;;   (let 
-;;     (
-;;       (art-addr (var-get artist-address))
-;;       (result (fold mint-many-iter passes (ok true)))
-;;       (current-balance (get-balance tx-sender))
-;;     )
-;;     (asserts! (is-eq (var-get locked) false) (err ERR-CONTRACT-LOCKED))
-;;     (map-set token-count tx-sender (+ current-balance (len passes)))    
-;;     result
-;;   )
-;; )
-
-;; (define-private (mint-many-iter (mint-pass uint) (last-success (response bool uint)))
-;;   (let 
-;;     (
-;;       (uri (unwrap! (map-get? mint-passes mint-pass) (err ERR-NOT-FOUND)))
-;;     ) 
-;;     (try! last-success)
-;;     (map-delete mint-passes mint-pass)
-;;     (map-set cids mint-pass uri)      
-;;     (nft-mint? nft-asset-class mint-pass tx-sender)
-;;   )
-;; )
-
-;; #[allow(unchecked_data)]
 (define-public (create-mint-passes (uris (list 25 (string-ascii 256))))
   (let 
     (
@@ -153,6 +136,10 @@
     )
     (asserts! (or (is-eq tx-sender DEPLOYER) (is-eq tx-sender art-addr)) (err ERR-NOT-AUTHORIZED))
     (asserts! (is-eq (var-get locked) false) (err ERR-CONTRACT-LOCKED))
+    (print {
+      mintPasses: pass-ids,
+      uris: uris
+    })
     (ok pass-ids)))
 
 (define-private (create-mint-pass (uri (string-ascii 256)))
@@ -167,9 +154,6 @@
 )
 
 ;; NON-CUSTODIAL FUNCTIONS START
-(define-map token-count principal uint)
-(define-map market uint {price: uint, commission: principal, royalty: uint})
-
 (define-read-only (get-balance (account principal))
   (default-to u0
     (map-get? token-count account)))
@@ -182,6 +166,7 @@
     ) 
     (try! (nft-mint? nft-asset-class mint-pass recipient))
     (map-delete mint-passes mint-pass)
+    (map-delete market mint-pass)
     (map-set cids mint-pass uri)      
     (map-set token-count
             recipient
@@ -214,20 +199,19 @@
     (print {a: "unlist-in-ustx", mint-pass: mint-pass})
     (ok true)))
 
-(define-public (buy-in-ustx (mint-pass uint) (comm-trait <commission-trait>))
-  (let ((owner DEPLOYER)
-      (listing (unwrap! (map-get? market mint-pass) (err ERR-LISTING)))
-      (price (get price listing))
-      (royalty (get royalty listing)))
-    (asserts! (is-eq (contract-of comm-trait) (get commission listing)) (err ERR-WRONG-COMMISSION))
-    (try! (stx-transfer? price tx-sender owner))
-    (try! (pay-royalty price royalty))
-    (try! (contract-call? comm-trait pay mint-pass price))
-    (map-delete market mint-pass)
-    (print {a: "buy-in-ustx", mint-pass: mint-pass})
-    (trnsfr mint-pass owner tx-sender)
-  )
-)
+;; (define-public (buy-in-ustx (mint-pass uint) (comm-trait <commission-trait>))
+;;   (let ((owner DEPLOYER)
+;;       (listing (unwrap! (map-get? market mint-pass) (err ERR-LISTING)))
+;;       (price (get price listing))
+;;       (royalty (get royalty listing)))
+;;     (asserts! (is-eq (contract-of comm-trait) (get commission listing)) (err ERR-WRONG-COMMISSION))
+;;     (try! (stx-transfer? price tx-sender owner))
+;;     (try! (pay-royalty price royalty))
+;;     (try! (contract-call? comm-trait pay mint-pass price))
+;;     (print {a: "buy-in-ustx", mint-pass: mint-pass})
+;;     (trnsfr mint-pass owner tx-sender)
+;;   )
+;; )
     
 (define-data-var royalty-percent uint u500)
 

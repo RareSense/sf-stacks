@@ -89,6 +89,7 @@
     (begin
       (asserts! (or (is-eq tx-sender (var-get artist-address)) (is-eq tx-sender DEPLOYER)) (err ERR-NOT-AUTHORIZED))
       (var-set last-id id-reached)
+      
       (ok id-reached))))
 
 (define-private (mint-for-many-iter (recipient principal) (next-id uint))
@@ -96,7 +97,13 @@
     (begin
       (unwrap! (nft-mint? nft-asset-class next-id tx-sender) next-id)
       (unwrap! (nft-transfer? nft-asset-class next-id tx-sender recipient) next-id)
-      (map-set token-count recipient (+ (get-balance recipient) u1))      
+      (map-set token-count recipient (+ (get-balance recipient) u1))   
+      (print {
+        nftId: next-id,
+        owner: recipient,
+        metadataUri: (var-get metadata-uri),
+        price: (var-get total-price)
+      })   
       (+ next-id u1)
     )
     next-id))
@@ -132,6 +139,13 @@
         (try! (stx-transfer? total-commission tx-sender COMM-ADDR))
       )    
     )
+    (print {
+      lastNftId: last-nft-id,
+      idReached: id-reached,
+      owner: tx-sender,
+      metadataUri: (var-get metadata-uri),
+      price: (var-get total-price)
+    })
     (ok id-reached)))
 
 (define-private (mint-many-iter (ignore bool) (next-id uint))
@@ -190,19 +204,6 @@
     (var-set metadata-frozen true)
     (ok true)))
 
-;; ;; Non-custodial SIP-009 transfer function
-
-;; ;; #[allow(unchecked_data)]
-(define-public (transfer (token-id uint) (sender principal) (recipient principal))
-  (begin
-    (asserts! (is-eq tx-sender sender) (err ERR-INVALID-USER))
-    (asserts! (or (is-eq tx-sender (var-get artist-address)) (is-eq tx-sender DEPLOYER)) (err ERR-NOT-AUTHORIZED))
-    (match (trnsfr token-id sender recipient)
-      id (ok true)
-      err (err err)
-    )
-  )
-)
 ;; read-only functions
 (define-read-only (get-owner (token-id uint))
   (ok (nft-get-owner? nft-asset-class token-id)))
@@ -238,19 +239,12 @@
   (default-to u0
     (map-get? token-count account)))
 
-;; #[allow(unchecked_data)]
-(define-private (trnsfr (token-id uint) (sender principal) (recipient principal))
-  (let 
-    (
-      (recipient-balance (get-balance recipient))
-    ) 
-    (try! (nft-mint? nft-asset-class token-id tx-sender))
-    (map-set token-count
-            recipient
-            (+ recipient-balance u1))
-    (ok token-id)
+(define-public (transfer (token-id uint) (sender principal) (recipient principal))
+  (begin
+    (ok true)
   )
 )
+
 (begin
   (print {
     totalNfts: (var-get mint-limit),
