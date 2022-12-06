@@ -39,6 +39,9 @@ path = "contracts/sf-marketplace-bid.clar"
 [contracts.sf-auctions]
 path = "contracts/sf-auctions.clar"
 
+[contracts.climate-refugees-charity-collection]
+path = "contracts/climate-refugees-charity-collection.clar"
+
 [repl]
 costs_version = 2
 parser_version = 2
