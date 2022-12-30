@@ -16,10 +16,20 @@
     (ok (var-set commission-address address))))
 
 ;; #[allow(unchecked_data)]
+(define-public (get-commission-address)
+  (ok (var-get commission-address))
+)
+
+;; #[allow(unchecked_data)]
 (define-public (set-commission (comm uint))
   (begin
     (asserts! (is-eq tx-sender DEPLOYER) (err ERR-NOT-AUTHORIZED))
     (ok (var-set commission comm))))
+
+;; #[allow(unchecked_data)]
+(define-public (get-commission)
+    (ok (var-get commission))
+)
 
 (define-public (pay (id uint) (price uint))
   (let (
