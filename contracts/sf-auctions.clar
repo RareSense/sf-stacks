@@ -161,6 +161,31 @@
 )
 
 ;; #[allow(unchecked_data)]
+(define-public (refund-bid (collection <nft-trait>) (nft-id uint))
+  (begin
+    (asserts! (is-eq tx-sender contract-owner) (err err-user-not-authorized))
+    (match (map-get? bids {collection: (contract-of collection), nft-id: nft-id})
+        bid (begin
+                
+                (map-delete bids {collection: (contract-of collection), nft-id: nft-id})
+                (try! (as-contract (stx-transfer? (get bid-amount bid) contract-address (get buyer bid))))
+                (print {
+                  amount-refunded: (get bid-amount bid),
+                })
+                (unwrap-panic (ok true))
+               
+            )
+            (begin
+                (asserts! (is-eq tx-sender contract-owner) (err err-user-not-authorized))
+                (unwrap-panic (ok true))
+            )
+            
+    )
+    (ok "Bid refunded")
+  )
+)
+
+;; #[allow(unchecked_data)]
 (define-public (set-accepting-bids-enabled (enabled bool))
     (begin
         (asserts! (is-eq tx-sender contract-owner) (err err-user-not-authorized))

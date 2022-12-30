@@ -13,6 +13,9 @@ path = ".requirements"
 [contracts.commission-trait]
 path = "contracts/commission-trait.clar"
 
+[contracts.nft-trait]
+path = "contracts/nft-trait.clar"
+
 [contracts.sf-commission]
 path = "contracts/sf-commission.clar"
 
