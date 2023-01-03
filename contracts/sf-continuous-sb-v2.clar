@@ -9,7 +9,7 @@
 ;;  4. set the approriate royalties
 
 (impl-trait 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.nft-trait)
-(use-trait commission-trait .commission-trait.commission)
+(use-trait commission-trait 'SP2YXDZANCCQQ9KNQRS7QVK89CWRGHPAR1AHCB5PQ.ab-commission.commission)
 
 (define-non-fungible-token nft-asset-class uint)
 
