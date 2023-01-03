@@ -39,7 +39,7 @@
 
 (define-data-var placing-bids-enabled bool true)
 (define-data-var accepting-bids-enabled bool true)
-(define-data-var commission uint u200)
+(define-data-var commission uint u0)
 (define-data-var id uint u0)
 
 ;; #[allow(unchecked_data)]
@@ -166,14 +166,21 @@
     (asserts! (is-eq tx-sender contract-owner) (err err-user-not-authorized))
     (match (map-get? bids {collection: (contract-of collection), nft-id: nft-id})
         bid (begin
-                
                 (map-delete bids {collection: (contract-of collection), nft-id: nft-id})
                 (try! (as-contract (stx-transfer? (get bid-amount bid) contract-address (get buyer bid))))
-                (print {
-                  amount-refunded: (get bid-amount bid),
+                (print { 
+                  action: "refund-bid",
+                  payload: {
+                    action_event_index: (get action-event-index bid),
+                    collection_id: (contract-of collection),
+                    token_id: nft-id,
+                    bidder_address: (get buyer bid),
+                    seller_address: (get seller bid),
+                    bid_amount: (get bid-amount bid), 
+                    memo: (get memo bid)
+                  }
                 })
                 (unwrap-panic (ok true))
-               
             )
             (begin
                 (asserts! (is-eq tx-sender contract-owner) (err err-user-not-authorized))
