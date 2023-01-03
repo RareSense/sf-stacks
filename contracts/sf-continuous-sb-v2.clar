@@ -213,7 +213,7 @@
 ;;   )
 ;; )
     
-(define-data-var royalty-percent uint u500)
+(define-data-var royalty-percent uint u0)
 
 (define-read-only (get-royalty-percent)
   (ok (var-get royalty-percent)))
