@@ -39,7 +39,7 @@
 
 (define-data-var placing-bids-enabled bool true)
 (define-data-var accepting-bids-enabled bool true)
-(define-data-var commission uint u200)
+(define-data-var commission uint u0)
 (define-data-var id uint u0)
 
 ;; #[allow(unchecked_data)]
