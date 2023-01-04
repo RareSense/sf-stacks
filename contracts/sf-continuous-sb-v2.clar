@@ -4,7 +4,7 @@
 
 ;; checklist when deploying for a new collection change the following
 ;;  1. set comission contract that implemented comission-trait
-;;  2. replace nft-asset-class with meaningful name e.g. megapont-ap
+;;  2. replace climate-action-collection with meaningful name e.g. megapont-ap
 ;;  3. set appropriate artist-address
 ;;  4. set the approriate royalties
 
@@ -66,12 +66,12 @@
       (begin 
         (asserts! (is-owner token-id tx-sender) (err ERR-NOT-AUTHORIZED))
         (print {method: "burn", tokenId: token-id})
-        (nft-burn? nft-asset-class token-id tx-sender))
+        (nft-burn? climate-action-collection token-id tx-sender))
     )
 )
 
 (define-private (is-owner (token-id uint) (user principal))
-  (is-eq user (unwrap! (nft-get-owner? nft-asset-class token-id) false)))
+  (is-eq user (unwrap! (nft-get-owner? climate-action-collection token-id) false)))
  
 ;; #[allow(unchecked_data)]
 (define-public (set-token-uri (uri (string-ascii 256)) (token-id uint))
@@ -105,7 +105,7 @@
 )
 
 (define-read-only (get-owner (token-id uint))
-  (match (nft-get-owner? nft-asset-class token-id)
+  (match (nft-get-owner? climate-action-collection token-id)
     owner (ok (some owner))
     (match (map-get? mint-passes token-id)
       uri (ok (some DEPLOYER))
@@ -164,7 +164,7 @@
       (uri (unwrap! (map-get? mint-passes mint-pass) (err ERR-NOT-FOUND)))
       (recipient-balance (get-balance recipient))
     ) 
-    (try! (nft-mint? nft-asset-class mint-pass recipient))
+    (try! (nft-mint? climate-action-collection mint-pass recipient))
     (map-delete mint-passes mint-pass)
     (map-delete market mint-pass)
     (map-set cids mint-pass uri)      
