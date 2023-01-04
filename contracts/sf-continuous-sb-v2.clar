@@ -9,7 +9,7 @@
 ;;  4. set the approriate royalties
 
 (impl-trait 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.nft-trait)
-(use-trait commission-trait 'SP2YXDZANCCQQ9KNQRS7QVK89CWRGHPAR1AHCB5PQ.ab-commission.commission)
+(use-trait commission-trait 'SP2YXDZANCCQQ9KNQRS7QVK89CWRGHPAR1AHCB5PQ.commission-trait.commission)
 
 (define-non-fungible-token climate-action-collection uint)
 
