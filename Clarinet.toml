@@ -1,56 +1,61 @@
 [project]
-name = "sf-stacks"
+name = 'sf-stacks'
+description = ''
 authors = []
-description = ""
 telemetry = false
-boot_contracts = ["pox", "costs-v2", "bns"]
+cache_dir = '.cache'
 
 [[project.requirements]]
-contract_id = "SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait"
+contract_id = 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait'
 
-[project.cache_location]
-path = ".requirements"
-[contracts.commission-trait]
-path = "contracts/commission-trait.clar"
-
-[contracts.nft-trait]
-path = "contracts/nft-trait.clar"
-
-[contracts.sf-commission]
-path = "contracts/sf-commission.clar"
-
-[contracts.sf-continuous]
-path = "contracts/sf-continuous.clar"
-
-[contracts.sf-continuous-sb-v2]
-path = "contracts/sf-continuous-sb-v2.clar"
-
-[contracts.sf-editions]
-path = "contracts/sf-editions.clar"
-
-[contracts.sf-editions-sb]
-path = "contracts/sf-editions-sb.clar"
-
-[contracts.sf-editions-sb-v2]
-path = "contracts/sf-editions-sb-v2.clar"
-
-
-[contracts.sf-marketplace-bid]
-path = "contracts/sf-marketplace-bid.clar"
-
-
-[contracts.sf-auctions]
-path = "contracts/sf-auctions.clar"
+[[project.requirements]]
+contract_id = 'SP2YXDZANCCQQ9KNQRS7QVK89CWRGHPAR1AHCB5PQ.commission-trait'
 
 [contracts.climate-refugees-charity-collection]
-path = "contracts/climate-refugees-charity-collection.clar"
+path = 'contracts/climate-refugees-charity-collection.clar'
+clarity_version = 1
 
-[repl]
-costs_version = 2
-parser_version = 2
+[contracts.commission-trait]
+path = 'contracts/commission-trait.clar'
+clarity_version = 1
 
+[contracts.nft-trait]
+path = 'contracts/nft-trait.clar'
+clarity_version = 1
+
+[contracts.sf-auctions]
+path = 'contracts/sf-auctions.clar'
+clarity_version = 1
+
+[contracts.sf-commission]
+path = 'contracts/sf-commission.clar'
+clarity_version = 1
+
+[contracts.sf-continuous]
+path = 'contracts/sf-continuous.clar'
+clarity_version = 1
+
+[contracts.sf-continuous-sb-v2]
+path = 'contracts/sf-continuous-sb-v2.clar'
+clarity_version = 1
+
+[contracts.sf-editions]
+path = 'contracts/sf-editions.clar'
+clarity_version = 1
+
+[contracts.sf-editions-sb]
+path = 'contracts/sf-editions-sb.clar'
+clarity_version = 1
+
+[contracts.sf-editions-sb-v2]
+path = 'contracts/sf-editions-sb-v2.clar'
+clarity_version = 1
+
+[contracts.sf-marketplace-bid]
+path = 'contracts/sf-marketplace-bid.clar'
+clarity_version = 1
 [repl.analysis]
-passes = ["check_checker"]
+passes = ['check_checker']
 
 [repl.analysis.check_checker]
 strict = false
